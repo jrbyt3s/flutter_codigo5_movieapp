@@ -5,6 +5,8 @@ import 'package:flutter_codigo5_movieapp/sevices/api_service.dart';
 import 'package:flutter_codigo5_movieapp/ui/widgets/item_filter_widget.dart';
 import 'package:flutter_codigo5_movieapp/ui/widgets/item_movie_list_widget.dart';
 
+import '../models/genre_model.dart';
+
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
 
@@ -15,12 +17,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List movies = [];
   List<MovieModel> movieList = [];
+  List<MovieModel> moviesListAux = [];
+  List<GenreModel> genresList = [];
   final APIService _apiService = APIService();
+  int indexFilter = 0;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getData();
+    getData2();
     //getMovies();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -37,7 +43,21 @@ class _HomePageState extends State<HomePage> {
 
   getData2() async {
     movieList = await _apiService.getMovies();
+    moviesListAux = movieList;
+    genresList = await _apiService.getGenres();
+    genresList.insert(0, GenreModel(id: 0, name: "All", selected: true));
+    indexFilter = genresList[0].id;
     //print(movieList[3].title);
+    setState(() {});
+  }
+
+  filterMovie() {
+    movieList = moviesListAux;
+    if (indexFilter != 0) {
+      movieList = movieList
+          .where((element) => element.genreIds.contains(indexFilter))
+          .toList();
+    }
     setState(() {});
   }
 
@@ -60,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Welcome, Mario",
+                          "Welcome, John",
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -103,25 +123,35 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 10),
                 SingleChildScrollView(
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: [
-                      ItemFilterWidget(textFilter: "All", isSelected: true),
-                      ItemFilterWidget(textFilter: "Action", isSelected: false),
-                      ItemFilterWidget(textFilter: "Drama", isSelected: false),
-                      ItemFilterWidget(textFilter: "Comedy", isSelected: false),
-                      ItemFilterWidget(textFilter: "terror", isSelected: false),
-                    ],
+                    children: genresList
+                        .map(
+                          (e) => ItemFilterWidget(
+                            textFilter: e.name,
+                            isSelected: indexFilter == e.id,
+                            onTap: () {
+                              indexFilter = e.id;
+                              print(indexFilter);
+                              filterMovie();
+                            },
+                          ),
+                        )
+                        .toList(),
                   ),
+                ),
+                const SizedBox(
+                  height: 16.0,
                 ),
                 ListView.builder(
                   shrinkWrap: true,
                   physics: ScrollPhysics(),
                   itemCount: movieList.length,
-                  itemBuilder: (BuildContext context, index) {
-                    //print(movieList[index].originalTitle);
-                    return ItemMovieListWidget(model: movieList[index]);
+                  itemBuilder: (BuildContext context, int index) {
+                    return ItemMovieListWidget(
+                      movieModel: movieList[index],
+                    );
                   },
                 ),
               ],

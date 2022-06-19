@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_codigo5_movieapp/models/movie_detail_model.dart';
 import 'package:flutter_codigo5_movieapp/models/review_model.dart';
+import 'package:flutter_codigo5_movieapp/pages/cast_detail_page.dart';
 import 'package:flutter_codigo5_movieapp/pages/player_page.dart';
 import 'package:flutter_codigo5_movieapp/ui/widgets/item_review_item.dart';
 import 'package:flutter_codigo5_movieapp/ui/widgets/title_description_widget.dart';
@@ -9,8 +10,10 @@ import 'package:flutter_codigo5_movieapp/utils/constans.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/cast_model.dart';
+import '../models/image_model.dart';
 import '../sevices/api_service.dart';
 import '../ui/widgets/item_cast_widget.dart';
+import '../ui/widgets/loading_indicator_widget.dart';
 
 class MovieDetailPage extends StatefulWidget {
   int movieId;
@@ -27,6 +30,8 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   bool isLoading = true;
   List<CastModel> castList = [];
   List<ReviewModel> reviews = [];
+  List<ImageModel> images = [];
+  int castId = 0;
 
   @override
   void initState() {
@@ -42,8 +47,20 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
     movieDetailModel = await _apiService.getMovie(widget.movieId);
     castList = await _apiService.getCast(widget.movieId);
     reviews = await _apiService.getReviews(widget.movieId);
+    images = await _apiService.getImages(widget.movieId);
     isLoading = false;
     setState(() {});
+  }
+
+  showDetailCast() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CastDetailPage(
+          castId: castId,
+        );
+      },
+    );
   }
 
   @override
@@ -191,14 +208,32 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             //Player Button
-                            ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => PlayerPage()));
-                                },
-                                child: Text('Play')),
+                            ElevatedButton.icon(
+                              icon: Icon(Icons.play_circle_fill, size: 40),
+                              style: ElevatedButton.styleFrom(
+                                primary: kBrandSecondaryColor,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 4.0, horizontal: 20.0),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => PlayerPage()));
+                              },
+                              label: Text(
+                                'Play',
+                                style: TextStyle(
+                                    color: kBrandPrimaryColor,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16.0),
+                              ),
+                            ),
+                            //
+                            SizedBox(height: 12),
                             TitleDescriptionWidget(
                               title: "Overview",
                             ),
@@ -276,21 +311,40 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                               child: Row(
                                 children: castList
                                     .map(
-                                      (CastModel itemCast) => GestureDetector(
+                                      (e) => GestureDetector(
                                         onTap: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return ShowDetailCastDialog();
-                                            },
-                                          );
+                                          castId = e.id;
+                                          showDetailCast();
                                         },
-                                        child:
-                                            ItemCastWidget(castModel: itemCast),
+                                        child: ItemCastWidget(castModel: e),
                                       ),
                                     )
                                     .toList(),
                               ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TitleDescriptionWidget(
+                              title: "Images",
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
+                            GridView.count(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: 2,
+                              childAspectRatio: 1.5,
+                              padding: EdgeInsets.zero,
+                              children: images
+                                  .map(
+                                    (e) => Image.network(
+                                      "https://image.tmdb.org/t/p/w500${e.filePath}",
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                  .toList(),
                             ),
                             const SizedBox(
                               height: 20,
@@ -317,16 +371,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                 ),
               ],
             )
-          : const Center(
-              child: SizedBox(
-                height: 26,
-                width: 26,
-                child: CircularProgressIndicator(
-                  color: kBrandSecondaryColor,
-                  strokeWidth: 2.0,
-                ),
-              ),
-            ),
+          : const LoadingIndicatorWidget(),
     );
   }
 }

@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_codigo5_movieapp/models/movie_model.dart';
+import 'package:flutter_codigo5_movieapp/utils/constans.dart';
 
 import '../../pages/movie_detail_page.dart';
 
 class ItemMovieListWidget extends StatelessWidget {
-  MovieModel model;
+  MovieModel movieModel;
 
-  ItemMovieListWidget({required this.model});
+  ItemMovieListWidget({
+    required this.movieModel,
+  });
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => MovieDetailPage(movieId: model.id)));
+                builder: (context) => MovieDetailPage(
+                      movieId: movieModel.id,
+                    )));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 14.0),
         width: double.infinity,
-        height: height * 0.55,
+        height: height * 0.65,
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
@@ -34,7 +40,7 @@ class ItemMovieListWidget extends StatelessWidget {
           image: DecorationImage(
             fit: BoxFit.cover,
             image: NetworkImage(
-              "http://image.tmdb.org/t/p/w500${model.posterPath}",
+              "http://image.tmdb.org/t/p/w500${movieModel.posterPath}",
             ),
           ),
         ),
@@ -58,7 +64,7 @@ class ItemMovieListWidget extends StatelessWidget {
                   children: [
                     Text(
                       // movies[index]["original_title"],
-                      model.originalTitle,
+                      movieModel.originalTitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -74,7 +80,7 @@ class ItemMovieListWidget extends StatelessWidget {
                       height: 3,
                       width: 100,
                       decoration: BoxDecoration(
-                        color: Color(0xff23dec3),
+                        color: kBrandSecondaryColor,
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                     ),
@@ -82,7 +88,8 @@ class ItemMovieListWidget extends StatelessWidget {
                       height: 8.0,
                     ),
                     Text(
-                      model.overview,
+                      // movies[index]["overview"],
+                      movieModel.overview,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -90,7 +97,9 @@ class ItemMovieListWidget extends StatelessWidget {
                         fontSize: 13.0,
                       ),
                     ),
-                    const SizedBox(height: 6.0),
+                    const SizedBox(
+                      height: 6.0,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -105,7 +114,10 @@ class ItemMovieListWidget extends StatelessWidget {
                               width: 4.0,
                             ),
                             Text(
-                              model.releaseDate.toString().substring(0, 10),
+                              // movies[index]["release_date"],
+                              movieModel.releaseDate
+                                  .toString()
+                                  .substring(0, 10),
                               style: TextStyle(
                                   color: Colors.white, fontSize: 12.0),
                             ),
@@ -118,10 +130,12 @@ class ItemMovieListWidget extends StatelessWidget {
                               color: Colors.white,
                               size: 14.0,
                             ),
-                            const SizedBox(width: 4.0),
+                            const SizedBox(
+                              width: 4.0,
+                            ),
                             Text(
-                              //movies[index]["vote_count"].toString(),
-                              model.voteCount.toString(),
+                              // movies[index]["vote_count"].toString(),
+                              movieModel.voteCount.toString(),
                               style: TextStyle(
                                   color: Colors.white, fontSize: 12.0),
                             ),
@@ -129,7 +143,9 @@ class ItemMovieListWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6.0),
+                    const SizedBox(
+                      height: 6.0,
+                    ),
                   ],
                 ),
               ),
@@ -144,7 +160,7 @@ class ItemMovieListWidget extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Text(
-                  model.voteAverage.toString(),
+                  movieModel.voteAverage.toString(),
                   style: TextStyle(
                     fontSize: 20.0,
                     color: Colors.white,

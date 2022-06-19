@@ -15,6 +15,7 @@ class _PlayerPageState extends State<PlayerPage> {
   late BetterPlayerController _betterPlayerController;
   @override
   void initState() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     // =========== Bette Player: =================
     BetterPlayerConfiguration betterPlayerConfiguration =
         BetterPlayerConfiguration(
@@ -23,8 +24,8 @@ class _PlayerPageState extends State<PlayerPage> {
       rotation: 0,
       autoPlay: true,
     );
-    BetterPlayerDataSource dataSource = BetterPlayerDataSource(
-        BetterPlayerDataSourceType.network, forBiggerBlazesUrl);
+    BetterPlayerDataSource dataSource =
+        BetterPlayerDataSource(BetterPlayerDataSourceType.network, movieHLS);
     _betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
     _betterPlayerController.setupDataSource(dataSource);
     //=========== en Better Player =================
@@ -42,16 +43,33 @@ class _PlayerPageState extends State<PlayerPage> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: SystemUiOverlay.values);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          //const SizedBox(height: 8),
           Expanded(
             child: BetterPlayer(controller: _betterPlayerController),
+          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16.0),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(Icons.arrow_back, color: Colors.white)),
+                ],
+              ),
+            ),
           ),
         ],
       ),
