@@ -220,9 +220,14 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                               ),
                               onPressed: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => PlayerPage()));
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => PlayerPage()))
+                                    .then((value) {
+                                  SystemChrome.setPreferredOrientations([
+                                    DeviceOrientation.portraitUp,
+                                  ]);
+                                });
                               },
                               label: Text(
                                 'Play',

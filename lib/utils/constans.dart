@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 const String pathProduction = "https://api.themoviedb.org/3";
-const String apiKey = "54130dc4265f8a264d7decbecf7bcf84";
+const String apiKey = "4130dc4265f8a264d7decbecf7bcf845";
 const Color kBrandPrimaryColor = Color.fromARGB(255, 31, 33, 47);
 const Color kBrandSecondaryColor = Color(0xff23dec3);
 
